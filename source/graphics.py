@@ -29,22 +29,31 @@ class GraphicsManager:
         self.img_printing_1 = self._load_and_scale_image(config.IMG_PRINTING_1)
         self.img_printing_2 = self._load_and_scale_image(config.IMG_PRINTING_2)
         self.img_thanks = self._load_and_scale_image(config.IMG_THANKS)
+        self.img_error_bg = self._load_and_scale_image(config.IMG_ERROR_BG)
 
         self.btn_colour_img = self._load_png(config.IMG_BTN_COLOUR)
         self.btn_bw_img = self._load_png(config.IMG_BTN_BW)
         self.btn_print_yes_img = self._load_png(config.IMG_BTN_PRINT_YES)
         self.btn_print_no_img = self._load_png(config.IMG_BTN_PRINT_NO)
+        self.btn_try_again_img = self._load_png(config.IMG_BTN_TRY_AGAIN)
+        self.btn_skip_img = self._load_png(config.IMG_BTN_SKIP)
 
         btn_size = (config.BTN_WIDTH, config.BTN_HEIGHT)
         self.btn_colour_img = pygame.transform.scale(self.btn_colour_img, btn_size)
         self.btn_bw_img = pygame.transform.scale(self.btn_bw_img, btn_size)
         self.btn_print_yes_img = pygame.transform.scale(self.btn_print_yes_img, btn_size)
         self.btn_print_no_img = pygame.transform.scale(self.btn_print_no_img, btn_size)
+        self.btn_try_again_img = pygame.transform.scale(self.btn_try_again_img, btn_size)
+        self.btn_skip_img = pygame.transform.scale(self.btn_skip_img, btn_size)
 
         self.colour_btn_rect = self.btn_colour_img.get_rect(topleft=config.BTN_COLOUR_POS)
         self.bw_btn_rect = self.btn_bw_img.get_rect(topleft=config.BTN_BW_POS)
         self.print_yes_btn_rect = self.btn_print_yes_img.get_rect(topleft=config.BTN_PRINT_YES_POS)
         self.print_no_btn_rect = self.btn_print_no_img.get_rect(topleft=config.BTN_PRINT_NO_POS)
+        self.try_again_btn_rect = self.btn_try_again_img.get_rect(topleft=config.BTN_TRY_AGAIN_POS)
+        self.skip_btn_rect = self.btn_skip_img.get_rect(topleft=config.BTN_SKIP_POS)
+
+        self.status_font = pygame.font.SysFont(None, 36)
 
         self.countdown_imgs = [self._load_png(path) for path in config.COUNTDOWN_IMAGES]
 
@@ -137,6 +146,37 @@ class GraphicsManager:
 
         pygame.display.flip()
 
+    def _draw_text_box(self, text, center, max_width, text_color=(255, 255, 255), box_color=(0, 0, 0, 160)):
+        # Word-wraps text to max_width and draws it on a semi-transparent box, centered at `center`.
+        words = text.split()
+        lines = []
+        current_line = ""
+        for word in words:
+            candidate = f"{current_line} {word}".strip()
+            if self.status_font.size(candidate)[0] <= max_width or not current_line:
+                current_line = candidate
+            else:
+                lines.append(current_line)
+                current_line = word
+        if current_line:
+            lines.append(current_line)
+
+        line_surfaces = [self.status_font.render(line, True, text_color) for line in lines]
+        line_height = self.status_font.get_linesize()
+        box_width = max((s.get_width() for s in line_surfaces), default=0) + 40
+        box_height = line_height * len(line_surfaces) + 30
+
+        box_surface = pygame.Surface((box_width, box_height), pygame.SRCALPHA)
+        box_surface.fill(box_color)
+        box_rect = box_surface.get_rect(center=center)
+        self.screen.blit(box_surface, box_rect)
+
+        for i, line_surface in enumerate(line_surfaces):
+            line_rect = line_surface.get_rect(
+                center=(center[0], box_rect.top + 15 + line_height * i + line_height // 2)
+            )
+            self.screen.blit(line_surface, line_rect)
+
     def draw_printing(self):
         current_time = time.time()
         if current_time - self.printing_last_toggle_time >= config.ANIMATION_INTERVAL:
@@ -145,6 +185,26 @@ class GraphicsManager:
 
         active_image = self.img_printing_1 if self.show_printing_first else self.img_printing_2
         self.screen.blit(active_image, (0, 0))
+
+        self._draw_text_box(
+            "Printing...",
+            center=(config.SCREEN_WIDTH // 2, config.SCREEN_HEIGHT - 50),
+            max_width=config.ERROR_MSG_MAX_WIDTH,
+        )
+
+        pygame.display.flip()
+
+    def draw_print_error(self, message):
+        self.screen.blit(self.img_error_bg, (0, 0))
+
+        self._draw_text_box(
+            message,
+            center=config.ERROR_MSG_CENTER,
+            max_width=config.ERROR_MSG_MAX_WIDTH,
+        )
+
+        self.screen.blit(self.btn_try_again_img, self.try_again_btn_rect)
+        self.screen.blit(self.btn_skip_img, self.skip_btn_rect)
 
         pygame.display.flip()
 

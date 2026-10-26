@@ -11,8 +11,11 @@ FULLSCREEN = True
 ANIMATION_INTERVAL = 0.4
 COUNTDOWN_STEP_TIME = 1.0
 FLASH_DURATION = 0.3
-PRINTING_DURATION = 30  # seconds to show the printing animation
 THANKS_DURATION = 5  # seconds to show the thank-you screen
+
+PRINT_STATUS_POLL_INTERVAL = 1.0  # how often to check CUPS job status while printing
+PRINTING_MIN_DISPLAY_SECONDS = 2  # avoid a flash if the print finishes almost instantly
+PRINTING_MAX_WAIT_SECONDS = 90  # safety net: force the error screen if still "printing" after this long
 
 # Strip canvas
 STRIP_CANVAS_WIDTH = 1200
@@ -47,6 +50,9 @@ COUNTDOWN_IMAGES = [
 IMG_PRINTING_1 = os.path.join(ASSETS_DIR, "printing-1.jpg")
 IMG_PRINTING_2 = os.path.join(ASSETS_DIR, "printing-2.jpg")
 IMG_THANKS = os.path.join(ASSETS_DIR, "thanks-for-stopping-by.jpg")
+IMG_ERROR_BG = os.path.join(ASSETS_DIR, "error-background.jpg")
+IMG_BTN_TRY_AGAIN = os.path.join(ASSETS_DIR, "try-again-button.png")
+IMG_BTN_SKIP = os.path.join(ASSETS_DIR, "skip-button.png")
 FONT_DATE_PATH = os.path.join(ASSETS_DIR, "DS-DIGIT.TTF")
 
 # Button dimensions and positions
@@ -56,6 +62,12 @@ BTN_COLOUR_POS = (SCREEN_WIDTH // 2 - BTN_WIDTH - 20, SCREEN_HEIGHT // 2 - BTN_H
 BTN_BW_POS = (SCREEN_WIDTH // 2 + 20, SCREEN_HEIGHT // 2 - BTN_HEIGHT // 2)
 BTN_PRINT_YES_POS = BTN_COLOUR_POS
 BTN_PRINT_NO_POS = BTN_BW_POS
+BTN_TRY_AGAIN_POS = BTN_COLOUR_POS
+BTN_SKIP_POS = BTN_BW_POS
+
+# Error message box (default placement -- tune once the error-background asset exists)
+ERROR_MSG_CENTER = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
+ERROR_MSG_MAX_WIDTH = 600
 
 # Misc
 TOTAL_PHOTOS = 3

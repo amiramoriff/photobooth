@@ -34,6 +34,9 @@ def main():
     qr_surface = None
     printing_start_time = 0
     thanks_start_time = 0
+    current_job_id = None
+    print_error_message = ""
+    last_status_poll_time = 0
 
     def cleanup_pending_files():
         # Delete temporary sheet / strip JPG files
@@ -43,6 +46,20 @@ def main():
                 os.remove(path)
         pending_strip_path = None
         pending_sheet_path = None
+
+    def submit_print_job():
+        # Submits pending_sheet_path to the printer and moves to PRINTING,
+        # or straight to PRINT_ERROR if the submission itself failed.
+        nonlocal state, current_job_id, printing_start_time, print_error_message, last_status_poll_time
+        job_id = printer.print_file(pending_sheet_path)
+        if job_id is None:
+            print_error_message = "Could not connect to printer"
+            state = "PRINT_ERROR"
+        else:
+            current_job_id = job_id
+            printing_start_time = time.time()
+            last_status_poll_time = 0
+            state = "PRINTING"
 
     while running:
         current_time = time.time()
@@ -80,13 +97,22 @@ def main():
                 elif state == "CONFIRM_PRINT":
                     if graphics.print_yes_btn_rect.collidepoint(pos):
                         print("Sending to printer")
-                        printer.print_file(pending_sheet_path)
-
-                        printing_start_time = current_time
-                        state = "PRINTING"
+                        submit_print_job()
 
                     elif graphics.print_no_btn_rect.collidepoint(pos):
                         print("Printing skipped by user")
+                        cleanup_pending_files()
+
+                        thanks_start_time = current_time
+                        state = "THANKS"
+
+                elif state == "PRINT_ERROR":
+                    if graphics.try_again_btn_rect.collidepoint(pos):
+                        print("Retrying print job")
+                        submit_print_job()
+
+                    elif graphics.skip_btn_rect.collidepoint(pos):
+                        print("Print skipped after error")
                         cleanup_pending_files()
 
                         thanks_start_time = current_time
@@ -153,10 +179,26 @@ def main():
 
         elif state == "PRINTING":
             graphics.draw_printing()
-            if current_time - printing_start_time >= config.PRINTING_DURATION:
-                cleanup_pending_files()
-                thanks_start_time = current_time
-                state = "THANKS"
+
+            if current_time - last_status_poll_time >= config.PRINT_STATUS_POLL_INTERVAL:
+                last_status_poll_time = current_time
+                print_status, status_message = printer.get_job_status(current_job_id)
+
+                min_display_met = current_time - printing_start_time >= config.PRINTING_MIN_DISPLAY_SECONDS
+
+                if print_status == "error":
+                    print_error_message = status_message
+                    state = "PRINT_ERROR"
+                elif print_status == "done" and min_display_met:
+                    cleanup_pending_files()
+                    thanks_start_time = current_time
+                    state = "THANKS"
+                elif current_time - printing_start_time > config.PRINTING_MAX_WAIT_SECONDS:
+                    print_error_message = "Printing is taking longer than expected"
+                    state = "PRINT_ERROR"
+
+        elif state == "PRINT_ERROR":
+            graphics.draw_print_error(print_error_message)
 
         elif state == "THANKS":
             graphics.draw_thanks()
