@@ -194,7 +194,7 @@ class GraphicsManager:
 
         pygame.display.flip()
 
-    def draw_print_error(self, message):
+    def draw_print_error_message(self, message):
         self.screen.blit(self.img_error_bg, (0, 0))
 
         self._draw_text_box(
@@ -202,6 +202,11 @@ class GraphicsManager:
             center=config.ERROR_MSG_CENTER,
             max_width=config.ERROR_MSG_MAX_WIDTH,
         )
+
+        pygame.display.flip()
+
+    def draw_print_error_action(self):
+        self.screen.blit(self.img_error_bg, (0, 0))
 
         self.screen.blit(self.btn_try_again_img, self.try_again_btn_rect)
         self.screen.blit(self.btn_skip_img, self.skip_btn_rect)

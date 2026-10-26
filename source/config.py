@@ -16,6 +16,7 @@ THANKS_DURATION = 5  # seconds to show the thank-you screen
 PRINT_STATUS_POLL_INTERVAL = 1.0  # how often to check CUPS job status while printing
 PRINTING_MIN_DISPLAY_SECONDS = 2  # avoid a flash if the print finishes almost instantly
 PRINTING_MAX_WAIT_SECONDS = 180  # safety net: force the error screen if still "printing" after this long
+PRINT_ERROR_MESSAGE_SECONDS = 5  # how long to show the error message alone before auto-advancing to Try Again / Skip
 
 # Strip canvas
 STRIP_CANVAS_WIDTH = 1200
