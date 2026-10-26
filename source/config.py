@@ -14,7 +14,12 @@ FLASH_DURATION = 0.3
 THANKS_DURATION = 5  # seconds to show the thank-you screen
 
 PRINT_STATUS_POLL_INTERVAL = 1.0  # how often to check CUPS job status while printing
-PRINTING_MIN_DISPLAY_SECONDS = 2  # avoid a flash if the print finishes almost instantly
+# CUPS/Gutenprint reports this job as "completed" the moment it hands the data
+# off to the SELPHY (~2s), not when the printer is physically done -- a real
+# postcard print measured ~45s start to finish. This floor keeps the printing
+# screen up (blocking the next person) until the physical print has actually
+# had time to finish, with a buffer for variance between prints.
+PRINTING_MIN_DISPLAY_SECONDS = 55
 PRINTING_MAX_WAIT_SECONDS = 90  # safety net: force the error screen if still "printing" after this long
 PRINT_ERROR_MESSAGE_SECONDS = 5  # how long to show the error message alone before auto-advancing to Try Again / Skip
 
