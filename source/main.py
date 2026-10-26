@@ -73,7 +73,10 @@ def main():
                 running = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 pos = event.pos
-                if state == "TOUCH_TO_START":
+                if graphics.exit_btn_rect.collidepoint(pos):
+                    running = False
+
+                elif state == "TOUCH_TO_START":
                     state = "SELECT_FILTER"
                     camera.start()
 

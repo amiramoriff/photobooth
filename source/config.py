@@ -54,6 +54,7 @@ IMG_THANKS = os.path.join(ASSETS_DIR, "thanks-for-stopping-by.jpg")
 IMG_ERROR_BG = os.path.join(ASSETS_DIR, "error-background.jpg")
 IMG_BTN_TRY_AGAIN = os.path.join(ASSETS_DIR, "try-again-button.png")
 IMG_BTN_SKIP = os.path.join(ASSETS_DIR, "skip-button.png")
+IMG_BTN_EXIT = os.path.join(ASSETS_DIR, "exit.png")
 FONT_DATE_PATH = os.path.join(ASSETS_DIR, "DS-DIGIT.TTF")
 
 # Button dimensions and positions
@@ -69,6 +70,14 @@ BTN_SKIP_POS = BTN_BW_POS
 # Error message box (default placement -- tune once the error-background asset exists)
 ERROR_MSG_CENTER = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
 ERROR_MSG_MAX_WIDTH = 600
+
+# Exit button (small cross, top-left corner of every screen)
+EXIT_BTN_SIZE = (36, 36)
+EXIT_BTN_POS = (10, 10)
+# exit.png is an 800x480 canvas with the actual cross glyph centered in roughly
+# this region (rest is transparent) -- crop to it before scaling down, otherwise
+# the glyph becomes a near-invisible speck inside a mostly-empty small icon.
+EXIT_IMG_CROP_RECT = (281, 146, 238, 239)
 
 # Misc
 TOTAL_PHOTOS = 3

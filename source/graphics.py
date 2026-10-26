@@ -53,6 +53,11 @@ class GraphicsManager:
         self.try_again_btn_rect = self.btn_try_again_img.get_rect(topleft=config.BTN_TRY_AGAIN_POS)
         self.skip_btn_rect = self.btn_skip_img.get_rect(topleft=config.BTN_SKIP_POS)
 
+        exit_full_img = self._load_png(config.IMG_BTN_EXIT)
+        exit_cropped_img = exit_full_img.subsurface(pygame.Rect(*config.EXIT_IMG_CROP_RECT))
+        self.btn_exit_img = pygame.transform.smoothscale(exit_cropped_img, config.EXIT_BTN_SIZE)
+        self.exit_btn_rect = self.btn_exit_img.get_rect(topleft=config.EXIT_BTN_POS)
+
         self.status_font = pygame.font.SysFont(None, 36)
 
         self.countdown_imgs = [self._load_png(path) for path in config.COUNTDOWN_IMAGES]
@@ -87,6 +92,9 @@ class GraphicsManager:
             pygame.quit()
             sys.exit(1)
 
+    def _draw_exit_button(self):
+        self.screen.blit(self.btn_exit_img, self.exit_btn_rect)
+
     def draw_touch_to_start(self):
         """ Draws the touch to start screen, alternating between two images """
 
@@ -98,18 +106,21 @@ class GraphicsManager:
         active_image = self.img1 if self.show_first_image else self.img2
         self.screen.blit(active_image, (0, 0))
 
+        self._draw_exit_button()
         pygame.display.flip()
 
     def draw_select_filter(self):
         self.screen.blit(self.plaid_bg, (0, 0))
         self.screen.blit(self.btn_colour_img, self.colour_btn_rect)
         self.screen.blit(self.btn_bw_img, self.bw_btn_rect)
+        self._draw_exit_button()
         pygame.display.flip()
 
     def draw_confirm_print(self):
         self.screen.blit(self.plaid_bg, (0, 0))
         self.screen.blit(self.btn_print_yes_img, self.print_yes_btn_rect)
         self.screen.blit(self.btn_print_no_img, self.print_no_btn_rect)
+        self._draw_exit_button()
         pygame.display.flip()
 
     def draw_countdown(self, camera_surface, number_index):
@@ -120,10 +131,12 @@ class GraphicsManager:
             rect = num_img.get_rect(center=(config.SCREEN_WIDTH // 2, config.SCREEN_HEIGHT // 2))
             self.screen.blit(num_img, rect)
 
+        self._draw_exit_button()
         pygame.display.flip()
 
     def draw_flash(self):
         self.screen.fill((255, 255, 255))
+        self._draw_exit_button()
         pygame.display.flip()
 
     def build_qr_surface(self, data, target_size=190):
@@ -144,6 +157,7 @@ class GraphicsManager:
         qr_rect = qr_surface.get_rect(center=(config.SCREEN_WIDTH // 2, config.SCREEN_HEIGHT // 2))
         self.screen.blit(qr_surface, qr_rect)
 
+        self._draw_exit_button()
         pygame.display.flip()
 
     def _draw_text_box(self, text, center, max_width, text_color=(255, 255, 255), box_color=(0, 0, 0, 160)):
@@ -186,6 +200,7 @@ class GraphicsManager:
         active_image = self.img_printing_1 if self.show_printing_first else self.img_printing_2
         self.screen.blit(active_image, (0, 0))
 
+        self._draw_exit_button()
         pygame.display.flip()
 
     def draw_print_error_message(self, message):
@@ -197,16 +212,19 @@ class GraphicsManager:
             max_width=config.ERROR_MSG_MAX_WIDTH,
         )
 
+        self._draw_exit_button()
         pygame.display.flip()
 
     def draw_print_error_action(self):
-        self.screen.blit(self.img_error_bg, (0, 0))
+        self.screen.blit(self.plaid_bg, (0, 0))
 
         self.screen.blit(self.btn_try_again_img, self.try_again_btn_rect)
         self.screen.blit(self.btn_skip_img, self.skip_btn_rect)
 
+        self._draw_exit_button()
         pygame.display.flip()
 
     def draw_thanks(self):
         self.screen.blit(self.img_thanks, (0, 0))
+        self._draw_exit_button()
         pygame.display.flip()
