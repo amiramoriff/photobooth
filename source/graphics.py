@@ -186,12 +186,6 @@ class GraphicsManager:
         active_image = self.img_printing_1 if self.show_printing_first else self.img_printing_2
         self.screen.blit(active_image, (0, 0))
 
-        self._draw_text_box(
-            "Printing...",
-            center=(config.SCREEN_WIDTH // 2, config.SCREEN_HEIGHT - 50),
-            max_width=config.ERROR_MSG_MAX_WIDTH,
-        )
-
         pygame.display.flip()
 
     def draw_print_error_message(self, message):
