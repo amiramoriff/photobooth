@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+source/secrets.py
+output/
+*.log
