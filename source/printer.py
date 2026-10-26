@@ -49,6 +49,18 @@ class PrinterManager:
             print(f"Failed to print file {e}")
             return None
 
+    def cancel_job(self, job_id):
+        # Cancels a job so it can never resume/print later on its own --
+        # IPP_JOB_STOPPED jobs in particular are meant to auto-resume once
+        # the printer error clears, so this must be called before retrying
+        # or abandoning a job, or it can end up printing twice.
+        if job_id is None or not self.conn:
+            return
+        try:
+            self.conn.cancelJob(job_id, True)
+        except Exception as e:
+            print(f"Failed to cancel job {job_id}: {e}")
+
     def _humanize_reason(self, reason):
         # e.g. "media-empty-error" -> "Media Empty"
         text = reason

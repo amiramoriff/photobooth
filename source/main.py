@@ -187,6 +187,7 @@ def main():
                 min_display_met = current_time - printing_start_time >= config.PRINTING_MIN_DISPLAY_SECONDS
 
                 if print_status == "error":
+                    printer.cancel_job(current_job_id)
                     print_error_message = status_message
                     state = "PRINT_ERROR"
                 elif print_status == "done" and min_display_met:
@@ -194,6 +195,7 @@ def main():
                     thanks_start_time = current_time
                     state = "THANKS"
                 elif current_time - printing_start_time > config.PRINTING_MAX_WAIT_SECONDS:
+                    printer.cancel_job(current_job_id)
                     print_error_message = "Printing is taking longer than expected"
                     state = "PRINT_ERROR"
 
