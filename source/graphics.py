@@ -39,6 +39,11 @@ class GraphicsManager:
         self.btn_skip_img = self._load_png(config.IMG_BTN_SKIP)
 
         btn_size = (config.BTN_WIDTH, config.BTN_HEIGHT)
+        self.btn_two_strips_img = pygame.transform.scale(self._load_png(config.IMG_BTN_TWO_STRIPS), btn_size)
+        self.btn_four_strips_img = pygame.transform.scale(self._load_png(config.IMG_BTN_FOUR_STRIPS), btn_size)
+        self.two_strips_btn_rect = self.btn_two_strips_img.get_rect(topleft=config.BTN_TWO_STRIPS_POS)
+        self.four_strips_btn_rect = self.btn_four_strips_img.get_rect(topleft=config.BTN_FOUR_STRIPS_POS)
+
         self.btn_colour_img = pygame.transform.scale(self.btn_colour_img, btn_size)
         self.btn_bw_img = pygame.transform.scale(self.btn_bw_img, btn_size)
         self.btn_print_yes_img = pygame.transform.scale(self.btn_print_yes_img, btn_size)
@@ -123,6 +128,13 @@ class GraphicsManager:
         self._draw_exit_button()
         pygame.display.flip()
 
+    def draw_select_copies(self):
+        self.screen.blit(self.plaid_bg, (0, 0))
+        self.screen.blit(self.btn_two_strips_img, self.two_strips_btn_rect)
+        self.screen.blit(self.btn_four_strips_img, self.four_strips_btn_rect)
+        self._draw_exit_button()
+        pygame.display.flip()
+
     def draw_countdown(self, camera_surface, number_index):
         self.screen.blit(camera_surface, (0, 0))
 
@@ -191,7 +203,7 @@ class GraphicsManager:
             )
             self.screen.blit(line_surface, line_rect)
 
-    def draw_printing(self):
+    def draw_printing(self, progress_text=None):
         current_time = time.time()
         if current_time - self.printing_last_toggle_time >= config.ANIMATION_INTERVAL:
             self.show_printing_first = not self.show_printing_first
@@ -199,6 +211,13 @@ class GraphicsManager:
 
         active_image = self.img_printing_1 if self.show_printing_first else self.img_printing_2
         self.screen.blit(active_image, (0, 0))
+
+        if progress_text:
+            self._draw_text_box(
+                progress_text,
+                center=(config.SCREEN_WIDTH // 2, config.SCREEN_HEIGHT - 50),
+                max_width=config.ERROR_MSG_MAX_WIDTH,
+            )
 
         self._draw_exit_button()
         pygame.display.flip()

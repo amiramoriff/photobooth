@@ -38,6 +38,9 @@ def main():
     print_error_message = ""
     print_error_start_time = 0
     last_status_poll_time = 0
+    copies_total = 1  # 1 sheet = 2 strips, 2 sheets = 4 strips
+    copies_done = 0
+    select_copies_start_time = 0
 
     def cleanup_pending_files():
         # Delete temporary sheet / strip JPG files
@@ -101,8 +104,8 @@ def main():
 
                 elif state == "CONFIRM_PRINT":
                     if graphics.print_yes_btn_rect.collidepoint(pos):
-                        print("Sending to printer")
-                        submit_print_job()
+                        select_copies_start_time = current_time
+                        state = "SELECT_COPIES"
 
                     elif graphics.print_no_btn_rect.collidepoint(pos):
                         print("Printing skipped by user")
@@ -110,6 +113,22 @@ def main():
 
                         thanks_start_time = current_time
                         state = "THANKS"
+
+                elif state == "SELECT_COPIES":
+                    hit_copies = None
+                    if current_time - select_copies_start_time < 0.5:
+                        # 2-strips sits where the Print button was -- ignore a double-tap
+                        pass
+                    elif graphics.two_strips_btn_rect.collidepoint(pos):
+                        hit_copies = 1
+                    elif graphics.four_strips_btn_rect.collidepoint(pos):
+                        hit_copies = 2
+
+                    if hit_copies:
+                        copies_total = hit_copies
+                        copies_done = 0
+                        print(f"Sending to printer ({copies_total * 2} strips)")
+                        submit_print_job()
 
                 elif state == "PRINT_ERROR":
                     # Tap anywhere to skip ahead to the Try Again / Skip buttons
@@ -186,8 +205,12 @@ def main():
         elif state == "CONFIRM_PRINT":
             graphics.draw_confirm_print()
 
+        elif state == "SELECT_COPIES":
+            graphics.draw_select_copies()
+
         elif state == "PRINTING":
-            graphics.draw_printing()
+            progress_text = f"Printing {copies_done + 1} of {copies_total}" if copies_total > 1 else None
+            graphics.draw_printing(progress_text)
 
             if current_time - last_status_poll_time >= config.PRINT_STATUS_POLL_INTERVAL:
                 last_status_poll_time = current_time
@@ -201,9 +224,14 @@ def main():
                     print_error_start_time = current_time
                     state = "PRINT_ERROR"
                 elif print_status == "done" and min_display_met:
-                    cleanup_pending_files()
-                    thanks_start_time = current_time
-                    state = "THANKS"
+                    copies_done += 1
+                    if copies_done < copies_total:
+                        print(f"Printing copy {copies_done + 1} of {copies_total}")
+                        submit_print_job()
+                    else:
+                        cleanup_pending_files()
+                        thanks_start_time = current_time
+                        state = "THANKS"
                 elif current_time - printing_start_time > config.PRINTING_MAX_WAIT_SECONDS:
                     printer.cancel_job(current_job_id)
                     print_error_message = "Printing is taking longer than expected"
@@ -221,6 +249,8 @@ def main():
         elif state == "THANKS":
             graphics.draw_thanks()
             if current_time - thanks_start_time >= config.THANKS_DURATION:
+                copies_total = 1
+                copies_done = 0
                 state = "TOUCH_TO_START"
 
         clock.tick(30 if state in ("COUNTDOWN", "FLASH") else 12)

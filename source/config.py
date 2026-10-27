@@ -59,6 +59,8 @@ IMG_THANKS = os.path.join(ASSETS_DIR, "thanks-for-stopping-by.jpg")
 IMG_ERROR_BG = os.path.join(ASSETS_DIR, "error-background.jpg")
 IMG_BTN_TRY_AGAIN = os.path.join(ASSETS_DIR, "try-again-button.png")
 IMG_BTN_SKIP = os.path.join(ASSETS_DIR, "skip-button.png")
+IMG_BTN_TWO_STRIPS = os.path.join(ASSETS_DIR, "2-strips-button.png")
+IMG_BTN_FOUR_STRIPS = os.path.join(ASSETS_DIR, "4-strips-button.png")
 IMG_BTN_EXIT = os.path.join(ASSETS_DIR, "exit.png")
 FONT_DATE_PATH = os.path.join(ASSETS_DIR, "DS-DIGIT.TTF")
 
@@ -71,6 +73,8 @@ BTN_PRINT_YES_POS = BTN_COLOUR_POS
 BTN_PRINT_NO_POS = BTN_BW_POS
 BTN_TRY_AGAIN_POS = BTN_COLOUR_POS
 BTN_SKIP_POS = BTN_BW_POS
+BTN_TWO_STRIPS_POS = BTN_COLOUR_POS
+BTN_FOUR_STRIPS_POS = BTN_BW_POS
 
 # Error message box (default placement -- tune once the error-background asset exists)
 ERROR_MSG_CENTER = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
